@@ -22,6 +22,7 @@
 	"dependencies": {
 		"daisyui": "^2.22.0",
 		"lodash-es": "^4.17.21",
+		"midi-message-parser": "^2.0.1",
 		"pirate-midi-usb": "^2.4.7",
 		"solid-cached-resource": "^0.3.0",
 		"solid-icons": "^1.0.1",

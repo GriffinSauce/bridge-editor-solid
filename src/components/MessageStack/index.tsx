@@ -1,5 +1,7 @@
 import { Component, For } from "solid-js";
 import { AiOutlinePlus } from "solid-icons/ai";
+import { MidiMessage } from "midi-message-parser";
+
 import { state } from "../../store";
 import { createGetBank } from "../../resources/bank";
 import { configs, MessageType } from "./config";
@@ -27,7 +29,16 @@ export const MessageStack: Component<Props> = ({ type }) => {
 					bank().footswitches[state.selectedFootswitch]?.[key]?.messages || []
 				}
 			>
-				{(item) => JSON.stringify(item, null, 2)}
+				{(item) => {
+					const { statusByte, dataByte1, dataByte2 } = item;
+					const dataArray = [
+						parseInt(statusByte, 16),
+						parseInt(dataByte1, 16),
+						parseInt(dataByte2, 16),
+					];
+					const message = new MidiMessage(dataArray);
+					return JSON.stringify(message, null, 2);
+				}}
 			</For>
 
 			<button class="btn flex items-center justify-center no-animation">
