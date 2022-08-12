@@ -6,24 +6,24 @@ import { messageTypes } from "./MessageStack/config";
 let messageContainerScroll: number;
 
 export const Messages: Component = () => {
-  let messagesContainer: HTMLDivElement;
+	let messagesContainer: HTMLDivElement;
 
-  const handleScroll = debounce(() => {
-    messageContainerScroll = messagesContainer.scrollLeft;
-  }, 300);
+	const handleScroll = debounce(() => {
+		messageContainerScroll = messagesContainer.scrollLeft;
+	}, 300);
 
-  onMount(() => {
-    if (messageContainerScroll)
-      messagesContainer.scrollLeft = messageContainerScroll;
-    messagesContainer.addEventListener("scroll", handleScroll);
-  });
+	onMount(() => {
+		if (messageContainerScroll)
+			messagesContainer.scrollLeft = messageContainerScroll;
+		messagesContainer.addEventListener("scroll", handleScroll);
+	});
 
-  return (
-    <div
-      ref={messagesContainer}
-      class="flex justify-start gap-6 overflow-x-scroll"
-    >
-      <For each={messageTypes}>{(type) => <MessageStack type={type} />}</For>
-    </div>
-  );
+	return (
+		<div
+			ref={messagesContainer}
+			class="flex justify-start gap-6 overflow-x-scroll"
+		>
+			<For each={messageTypes}>{(type) => <MessageStack type={type} />}</For>
+		</div>
+	);
 };

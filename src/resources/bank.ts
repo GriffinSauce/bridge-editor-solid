@@ -10,7 +10,7 @@ import { BankSettings } from "pirate-midi-usb";
 export const createGetBank = (getBankNumber: Accessor<number>) =>
 	createCachedResource(
 		() => ["banks", getBankNumber()],
-		([, bankNumber]) => device()!.getBankSettings(bankNumber as number)
+		([, bankNumber]) => device()!.getBankSettings(bankNumber as number),
 	);
 
 export const createUpdateBank = (getBankNumber: Accessor<number>) =>
@@ -22,7 +22,7 @@ export const createUpdateBank = (getBankNumber: Accessor<number>) =>
 				mutateCachedValue(() => ["bank", getBankNumber()], user);
 				void refreshScreen(getBankNumber);
 			},
-		}
+		},
 	);
 
 const refreshScreen = async (getBankNumber: Accessor<number>) => {
