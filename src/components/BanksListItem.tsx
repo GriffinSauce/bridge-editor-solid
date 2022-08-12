@@ -1,5 +1,5 @@
 import { Component } from "solid-js";
-import { createGetBank } from "../resources/bank";
+import { createGetBank, createUpdateBank } from "../resources/bank";
 import { setState, state } from "../store";
 
 interface Props {
@@ -9,11 +9,11 @@ interface Props {
 export const BanksListItem: Component<Props> = ({ bankNumber }) => {
 	const onClick = () => setState({ selectedBank: bankNumber });
 
-	const [bank, { update }] = createGetBank(() => bankNumber);
+	const getBankNumber = () => bankNumber;
+	const [bank] = createGetBank(getBankNumber);
+	const { mutateAsync } = createUpdateBank(getBankNumber);
 
-	const onChange = (event) => {
-		update({ bankName: event.target.value });
-	};
+	const onChange = (event) => mutateAsync({ bankName: event.target.value });
 
 	return (
 		<li class="form-control">
