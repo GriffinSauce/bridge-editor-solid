@@ -4,11 +4,10 @@ import {
 	AiOutlineArrowUp,
 	AiOutlineVerticalAlignBottom,
 	AiOutlineToTop,
-	AiOutlineStepForward,
 } from "solid-icons/ai";
 import { FiChevronsRight, FiToggleRight, FiToggleLeft } from "solid-icons/fi";
 
-export const configs = {
+export const messages = {
 	bank: {
 		title: "Bank",
 		icon: AiOutlineLogin,
@@ -42,19 +41,67 @@ export const configs = {
 		icon: FiToggleLeft,
 	},
 	secondaryToggleOn: {
-		title: "Secondary toggle on",
+		title: "2nd toggle on",
 		icon: FiToggleRight,
 	},
 	secondaryToggleOff: {
-		title: "Secondary toggle off",
+		title: "2nd toggle off",
 		icon: FiToggleLeft,
-	},
-	numSequential: {
-		title: "Sequential",
-		icon: AiOutlineStepForward,
 	},
 };
 
-export type MessageType = keyof typeof configs;
+export type MessageType = keyof typeof messages;
 
-export const messageTypes = Object.keys(configs) as MessageType[];
+export const messageTypes = Object.keys(messages) as MessageType[];
+
+export const midiMessages = {
+	noteon: {
+		title: "Note On",
+		fields: {},
+	},
+	noteoff: {
+		title: "Note Off",
+		fields: {},
+	},
+	keypressure: {
+		title: "Key Pressure",
+		fields: {},
+	},
+	controlchange: {
+		title: "Control Change",
+		fields: {
+			channel: {
+				label: "Channel",
+			},
+			number: {
+				label: "Control",
+			},
+			value: {
+				label: "Value",
+			},
+		},
+	},
+	programchange: {
+		title: "Program Change",
+		fields: {
+			channel: {
+				label: "Channel",
+			},
+			number: {
+				label: "Number",
+			},
+		},
+	},
+	channelpressure: {
+		title: "Channel Pressure",
+		fields: {},
+	},
+	pitchbend: {
+		title: "Pitch Bend",
+		fields: {},
+	},
+	unknown: {
+		title: "Unknown",
+		fields: {},
+	},
+};

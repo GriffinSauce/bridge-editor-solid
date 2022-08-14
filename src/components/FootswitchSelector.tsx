@@ -9,9 +9,11 @@ export const FootswitchSelector: Component = () => {
 
 	return (
 		<div
-			class={`grid gap-3 w-48 ${
-				footswitches === 6 ? "grid-cols-3" : "grid-cols-2"
-			}`}
+			classList={{
+				["grid-cols-3"]: footswitches === 6,
+				["grid-cols-2"]: footswitches !== 6,
+			}}
+			class="grid gap-3 w-48"
 		>
 			{Array(footswitches)
 				.fill(undefined)

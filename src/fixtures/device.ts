@@ -219,7 +219,7 @@ const footSwitch: Footswitch = {
 				outputs: {
 					midi0: true,
 					flexi1: true,
-					flexi2: true,
+					flexi2: false,
 					usb: true,
 				},
 			},
@@ -235,7 +235,7 @@ const footSwitch: Footswitch = {
 				outputs: {
 					midi0: true,
 					flexi1: true,
-					flexi2: true,
+					flexi2: false,
 					usb: true,
 				},
 			},

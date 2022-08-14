@@ -9,16 +9,22 @@ const Editor: Component = () => {
 	const [tab, setTab] = createSignal<"banks" | "global">("banks");
 
 	return (
-		<main class="flex flex-col items-stretch items-start justify-start flex-1 min-h-0 px-20 space-y-3 text-center">
-			<div class="tabs tabs-boxed">
+		<main class="flex flex-col items-start justify-start flex-1 min-h-0 px-20 space-y-3 text-center">
+			<div class="tabs tabs-bordered">
 				<a
-					class={`tab ${tab() === "banks" ? "tab-active" : ""}`}
+					classList={{
+						"tab-active": tab() === "banks",
+					}}
+					class="tab tab-bordered"
 					onClick={() => setTab("banks")}
 				>
 					Banks
 				</a>
 				<a
-					class={`tab ${tab() === "global" ? "tab-active" : ""}`}
+					classList={{
+						"tab-active": tab() === "global",
+					}}
+					class="tab tab-bordered"
 					onClick={() => setTab("global")}
 				>
 					Global

@@ -19,14 +19,17 @@ export const BanksListItem: Component<Props> = ({ bankNumber }) => {
 		<li class="form-control">
 			<label class="cursor-pointer input-group">
 				<span
-					class={`flex items-center justify-center w-12 ${
-						state.selectedBank === bankNumber &&
-						"bg-secondary text-secondary-content"
-					}`}
+					classList={{
+						"text-accent": state.selectedBank === bankNumber,
+					}}
+					class="flex items-center justify-center w-12 text-sm font-semibold"
 				>
 					{bankNumber}
 				</span>
 				<input
+					classList={{
+						"text-accent": state.selectedBank === bankNumber,
+					}}
 					class="cursor-pointer focus:outline-none input grow bg-base-200"
 					type="text"
 					placeholder={`Bank ${bankNumber}`}

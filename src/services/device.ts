@@ -1,6 +1,5 @@
 import { createSignal } from "solid-js";
 import { PirateMidiDevice, BankSettings } from "pirate-midi-usb";
-import { bankSettings } from "../fixtures/device";
 
 const [connected, setConnected] = createSignal<boolean>(false);
 const [device, setDevice] = createSignal<PirateMidiDevice>();
