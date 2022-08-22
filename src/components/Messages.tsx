@@ -15,7 +15,9 @@ export const Messages: Component = () => {
 	onMount(() => {
 		if (messageContainerScroll)
 			messagesContainer.scrollLeft = messageContainerScroll;
-		messagesContainer.addEventListener("scroll", handleScroll);
+		setTimeout(() => {
+			messagesContainer.addEventListener("scroll", handleScroll);
+		});
 	});
 
 	return (
