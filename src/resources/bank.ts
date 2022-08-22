@@ -20,17 +20,8 @@ export const createUpdateBank = (getBankNumber: Accessor<number>) =>
 		{
 			onSuccess: (user) => {
 				mutateCachedValue(() => ["bank", getBankNumber()], user);
-				void refreshScreen(getBankNumber);
+				void device()!.refreshDisplay();
+				void device()!.refreshLeds();
 			},
 		},
 	);
-
-const refreshScreen = async (getBankNumber: Accessor<number>) => {
-	try {
-		const { currentBank } = await device()!.getGlobalSettings();
-		if (currentBank === getBankNumber())
-			void device()!.goToBank(getBankNumber());
-	} catch (error) {
-		console.error("Failed to refresh screen", error);
-	}
-};
