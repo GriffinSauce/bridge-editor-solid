@@ -1,3 +1,4 @@
+import { MidiMessageType } from "pirate-midi-usb";
 import {
 	AiOutlineLogin,
 	AiOutlineArrowDown,
@@ -54,20 +55,55 @@ export type MessageType = keyof typeof messages;
 
 export const messageTypes = Object.keys(messages) as MessageType[];
 
-export const midiMessages = {
-	noteon: {
+interface MessageConfig {
+	title: string;
+	fields: Record<string, { label: string }>;
+}
+
+export const midiMessages: Record<MidiMessageType, MessageConfig> = {
+	NoteOn: {
 		title: "Note On",
-		fields: {},
+		fields: {
+			channel: {
+				label: "Channel",
+			},
+			number: {
+				label: "Note",
+			},
+			value: {
+				label: "Velocity",
+			},
+		},
 	},
-	noteoff: {
+	NoteOff: {
 		title: "Note Off",
-		fields: {},
+		fields: {
+			channel: {
+				label: "Channel",
+			},
+			number: {
+				label: "Note",
+			},
+			value: {
+				label: "Velocity",
+			},
+		},
 	},
-	keypressure: {
-		title: "Key Pressure",
-		fields: {},
+	PolyPressure: {
+		title: "Note Off",
+		fields: {
+			channel: {
+				label: "Channel",
+			},
+			number: {
+				label: "Note",
+			},
+			value: {
+				label: "Velocity",
+			},
+		},
 	},
-	controlchange: {
+	ControlChange: {
 		title: "Control Change",
 		fields: {
 			channel: {
@@ -81,7 +117,7 @@ export const midiMessages = {
 			},
 		},
 	},
-	programchange: {
+	ProgramChange: {
 		title: "Program Change",
 		fields: {
 			channel: {
@@ -92,16 +128,30 @@ export const midiMessages = {
 			},
 		},
 	},
-	channelpressure: {
+	ChannelPressure: {
 		title: "Channel Pressure",
-		fields: {},
+		fields: {
+			channel: {
+				label: "Channel",
+			},
+			number: {
+				label: "Pressure",
+			},
+		},
 	},
-	pitchbend: {
+	PitchBend: {
 		title: "Pitch Bend",
-		fields: {},
+		fields: {
+			channel: {
+				label: "Channel",
+			},
+			number: {
+				label: "Pitch bend",
+			},
+		},
 	},
-	unknown: {
-		title: "Unknown",
+	SmartMessage: {
+		title: "Smart Message",
 		fields: {},
 	},
 };

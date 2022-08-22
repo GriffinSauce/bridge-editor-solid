@@ -2,23 +2,63 @@ import { Component, Match, Switch } from "solid-js";
 import { device, connected, connect, connectMock } from "../services/device";
 import Editor from "./Editor";
 
-const Intro = () => (
-	<main class="flex flex-col items-center justify-center flex-1 px-20 space-y-6 text-center">
-		<h1 class="text-5xl font-bold text-center">Bridge Editor</h1>
+const Intro = () => {
+	let fileInput;
+	const requestFile = () => {
+		fileInput.click();
+	};
 
-		<p class="text-2xl">
-			An aftermarket editor for Pirate Midi Bridge4 &amp; Bridge6 controllers.
-		</p>
+	const openFile = function (event) {
+		const input = event.target;
 
-		<button class="btn btn-primary" onClick={connect}>
-			Connect
-		</button>
+		if (!input.files?.length) return;
 
-		<button class="btn" onClick={connectMock}>
-			Demo
-		</button>
-	</main>
-);
+		const reader = new FileReader();
+
+		reader.onload = function () {
+			try {
+				const data = JSON.parse(reader.result.toString());
+				console.info("Loaded config", data);
+
+				const { deviceSettings, globalSettings, bankSettings } = data;
+				connectMock({
+					deviceInfo: deviceSettings,
+					globalSettings,
+					banks: bankSettings,
+				});
+			} catch (error) {
+				console.error(error);
+				alert("Error loading config, see console");
+			}
+		};
+
+		reader.readAsText(input.files[0]);
+	};
+	return (
+		<main class="flex flex-col items-center justify-center flex-1 px-20 space-y-6 text-center">
+			<h1 class="text-5xl font-bold text-center">Bridge Editor</h1>
+
+			<p class="text-2xl">
+				An aftermarket editor for Pirate Midi Bridge controllers.
+			</p>
+
+			<button class="btn btn-primary" onClick={connect}>
+				Connect device
+			</button>
+
+			<input
+				ref={fileInput}
+				class="hidden"
+				type="file"
+				accept=".json"
+				onChange={openFile}
+			/>
+			<button class="btn" onClick={requestFile}>
+				Upload a file
+			</button>
+		</main>
+	);
+};
 
 const Disconnected = () => (
 	<main class="flex flex-col items-center justify-center flex-1 px-20 space-y-6 text-center">

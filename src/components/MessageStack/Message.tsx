@@ -1,4 +1,4 @@
-import { decodeMidiMessage } from "pirate-midi-usb";
+import { decodeMidiMessage, MidiMessageType } from "pirate-midi-usb";
 import { BaseMessage, ExpMessage } from "pirate-midi-usb/lib/types/Messages";
 import { VsClose } from "solid-icons/vs";
 import { createEffect, createSignal } from "solid-js";
@@ -94,22 +94,24 @@ export const Message = ({ message }: Props) => {
 				))}
 			</div>
 
-			<div class="grid grid-cols-4">
-				{Object.entries(
-					getOutputs(device()!.getDeviceDescription().hardware),
-				).map(([port, { title }]) => (
-					<label class="label cursor-pointer justify-start gap-1">
-						<input
-							type="checkbox"
-							class="toggle toggle-xs peer"
-							checked={parsedMessage.outputs[port]}
-						/>
-						<span class="label-text text-xs text-base-content/50 peer-checked:text-base-content">
-							{title}
-						</span>
-					</label>
-				))}
-			</div>
+			{type() !== MidiMessageType.SmartMessage ? (
+				<div class="grid grid-cols-4">
+					{Object.entries(
+						getOutputs(device()!.getDeviceDescription().hardware),
+					).map(([port, { title }]) => (
+						<label class="label cursor-pointer justify-start gap-1">
+							<input
+								type="checkbox"
+								class="toggle toggle-xs peer"
+								checked={parsedMessage.outputs[port]}
+							/>
+							<span class="label-text text-xs text-base-content/50 peer-checked:text-base-content">
+								{title}
+							</span>
+						</label>
+					))}
+				</div>
+			) : null}
 		</div>
 	);
 };

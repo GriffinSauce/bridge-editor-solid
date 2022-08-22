@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
-import { PirateMidiDevice, BankSettings } from "pirate-midi-usb";
+import { PirateMidiDevice } from "pirate-midi-usb";
+import { DeviceState } from "pirate-midi-usb/lib/mock/device";
 
 const [connected, setConnected] = createSignal<boolean>(false);
 const [device, setDevice] = createSignal<PirateMidiDevice>();
@@ -33,27 +34,10 @@ export const connect = async () => {
 	_device.on("connect", handleReconnect);
 };
 
-export const connectMock = async () => {
+export const connectMock = async (deviceState: DeviceState) => {
 	// Dynamic import so Next picks the browser export
 	const { getMockDevice } = await import("pirate-midi-usb");
-
-	const { deviceInfo, globalSettings, bankSettings } = await import(
-		"../fixtures/device"
-	);
-
-	const _device = await getMockDevice({
-		deviceInfo,
-		globalSettings,
-		banks: Array(100)
-			.fill(undefined)
-			.map(
-				(_, index): BankSettings => ({
-					...bankSettings,
-					bankId: `${index}`,
-					bankName: `${bankSettings.bankName} ${index}`,
-				}),
-			),
-	});
+	const _device = await getMockDevice(deviceState);
 
 	setDevice(_device);
 	setConnected(true);

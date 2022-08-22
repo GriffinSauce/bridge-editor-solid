@@ -17,7 +17,7 @@ export const FootswitchSelector: Component = () => {
 		>
 			{Array(footswitches)
 				.fill(undefined)
-				.map((_, index) => index + 1)
+				.map((_, index) => index)
 				.sort((a, b) => {
 					// Sort top row to top
 					const aTop = a > footswitches / 2;
@@ -33,7 +33,7 @@ export const FootswitchSelector: Component = () => {
 						}`}
 						onClick={() => setState({ selectedFootswitch: footswitch })}
 					>
-						{footswitch}
+						{footswitch + 1}
 					</button>
 				))}
 		</div>

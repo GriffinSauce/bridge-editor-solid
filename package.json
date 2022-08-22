@@ -23,7 +23,7 @@
 		"daisyui": "^2.22.0",
 		"lodash-es": "^4.17.21",
 		"midi-message-parser": "^2.0.1",
-		"pirate-midi-usb": "^2.5.1",
+		"pirate-midi-usb": "^2.6.0",
 		"solid-cached-resource": "^0.3.0",
 		"solid-icons": "^1.0.1",
 		"solid-js": "^1.4.7"

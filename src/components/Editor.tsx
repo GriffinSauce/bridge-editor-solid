@@ -9,7 +9,7 @@ const Editor: Component = () => {
 	const [tab, setTab] = createSignal<"banks" | "global">("banks");
 
 	return (
-		<main class="flex flex-col items-start justify-start flex-1 min-h-0 px-20 space-y-3 text-center">
+		<main class="flex flex-col items-start justify-start flex-1 min-h-0 px-6 space-y-3 text-center">
 			<div class="tabs tabs-bordered">
 				<a
 					classList={{

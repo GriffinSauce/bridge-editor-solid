@@ -7,5 +7,5 @@ interface State {
 
 export const [state, setState] = createStore<State>({
 	selectedBank: 0,
-	selectedFootswitch: 1,
+	selectedFootswitch: 0,
 });
