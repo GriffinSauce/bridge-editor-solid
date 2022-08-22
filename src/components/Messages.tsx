@@ -1,7 +1,7 @@
 import { Component, For, onMount } from "solid-js";
 import { debounce } from "lodash-es";
 import { MessageStack } from "./MessageStack";
-import { messageTypes } from "./MessageStack/config";
+import { messageStackTypes } from "./MessageStack/config";
 
 let messageContainerScroll: number;
 
@@ -25,7 +25,9 @@ export const Messages: Component = () => {
 			ref={messagesContainer}
 			class="flex justify-start gap-6 overflow-x-scroll -mr-6"
 		>
-			<For each={messageTypes}>{(type) => <MessageStack type={type} />}</For>
+			<For each={messageStackTypes}>
+				{(type) => <MessageStack type={type} />}
+			</For>
 		</div>
 	);
 };

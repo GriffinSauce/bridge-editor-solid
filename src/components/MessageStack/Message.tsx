@@ -1,9 +1,14 @@
-import { decodeMidiMessage, MidiMessageType } from "pirate-midi-usb";
+import {
+	decodeMidiMessage,
+	encodeMidiMessage,
+	MidiMessageType,
+} from "pirate-midi-usb";
 import { BaseMessage, ExpMessage } from "pirate-midi-usb/lib/types/Messages";
 import { VsClose } from "solid-icons/vs";
 import { createEffect, createSignal } from "solid-js";
 import { device } from "../../services/device";
-import { midiMessages } from "./config";
+import { messages } from "./config";
+import { Fields, SmartFields } from "./Fields";
 
 // TODO: determine how hardware descriptors map to message keys
 // For now this should work for Bridge6 and Bridge4
@@ -35,7 +40,6 @@ interface Props {
 export const Message = ({ message }: Props) => {
 	const parsedMessage = decodeMidiMessage(message);
 	const [type, setType] = createSignal(parsedMessage.type);
-	// const { fields } = midiMessages[type()];
 
 	let selectWidthHelper;
 	const [selectWidth, setSelectWidth] = createSignal(0);
@@ -44,6 +48,17 @@ export const Message = ({ message }: Props) => {
 		setSelectWidth(selectWidthHelper.clientWidth + 30);
 	});
 
+	const onChange = (updateFields) => {
+		const updatedMessage = {
+			...parsedMessage,
+			...updateFields,
+		};
+		console.log("updatedMessage", updatedMessage);
+
+		const encoded = encodeMidiMessage(updatedMessage);
+		console.log("encoded", encoded);
+	};
+
 	return (
 		<div class="bg-neutral rounded-lg [width:18rem] p-1 grid gap-3">
 			<div class="flex justify-between relative">
@@ -51,7 +66,7 @@ export const Message = ({ message }: Props) => {
 					ref={selectWidthHelper}
 					class="font-semibold text-sm absolute px-1 border border-transparent opacity-0 z-0"
 				>
-					{midiMessages[type()].title}
+					{messages[type()].title}
 				</div>
 				<select
 					class="select select-sm select-ghost text-secondary focus:text-secondary px-1 pr-4 z-10"
@@ -63,7 +78,7 @@ export const Message = ({ message }: Props) => {
 					<option disabled selected>
 						Type
 					</option>
-					{Object.entries(midiMessages).map(([value, { title }]) => (
+					{Object.entries(messages).map(([value, { title }]) => (
 						<option selected={value === type()} value={value}>
 							{title}
 						</option>
@@ -75,26 +90,11 @@ export const Message = ({ message }: Props) => {
 				</button>
 			</div>
 
-			<div class="flex gap-1">
-				{Object.entries(midiMessages[type()].fields).map(([key, { label }]) => (
-					<div class="form-control min-w-0 flex-grow">
-						<label class="grid cursor-pointer" for={key}>
-							<span class="text-sm p-1">{label}</span>
-							<input
-								id={key}
-								name={key}
-								type="number"
-								class="input input-sm pr-0"
-								value={parsedMessage[key]}
-								min={0}
-								max={127}
-							/>
-						</label>
-					</div>
-				))}
-			</div>
+			<Fields message={parsedMessage} onChange={onChange} />
 
-			{type() !== MidiMessageType.SmartMessage ? (
+			{type() === MidiMessageType.SmartMessage ? (
+				<SmartFields message={parsedMessage} onChange={onChange} />
+			) : (
 				<div class="grid grid-cols-4">
 					{Object.entries(
 						getOutputs(device()!.getDeviceDescription().hardware),
@@ -111,7 +111,7 @@ export const Message = ({ message }: Props) => {
 						</label>
 					))}
 				</div>
-			) : null}
+			)}
 		</div>
 	);
 };
