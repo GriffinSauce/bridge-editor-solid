@@ -8,6 +8,10 @@
 		"jsx": "preserve",
 		"jsxImportSource": "solid-js",
 		"types": ["vite/client"],
+		"typeRoots": ["./node_modules/@types", "./types"],
+		"paths": {
+			"*": ["./types/*"]
+		},
 		"noEmit": true,
 		"isolatedModules": true
 	}

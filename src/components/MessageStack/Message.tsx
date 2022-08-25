@@ -1,117 +1,159 @@
+import { set } from "lodash-es";
 import {
 	decodeMidiMessage,
 	encodeMidiMessage,
 	MidiMessageType,
+	RawMessage,
+	RawExpMessage,
+	RawSmartMessage,
+	ParsedMessage,
+	ParsedExpMessage,
+	ParsedSmartMessage,
 } from "pirate-midi-usb";
-import { BaseMessage, ExpMessage } from "pirate-midi-usb/lib/types/Messages";
 import { VsClose } from "solid-icons/vs";
-import { createEffect, createSignal } from "solid-js";
-import { device } from "../../services/device";
-import { messages } from "./config";
+import { Accessor, createContext, useContext } from "solid-js";
+import { createStore, produce } from "solid-js/store";
+
 import { Fields, SmartFields } from "./Fields";
+import { OutputsSelector } from "./OutputsSelector";
+import { TypeSelect } from "./TypeSelect";
 
-// TODO: determine how hardware descriptors map to message keys
-// For now this should work for Bridge6 and Bridge4
-const getOutputs = (hardware: {
-	flexiports: number;
-	midiOutPorts: number;
-	midiInPorts: number;
-}) => {
-	return {
-		midi0: {
-			title: "DIN5",
-		},
-		flexi1: {
-			title: "Flexi1",
-		},
-		flexi2: {
-			title: "Flexi2",
-		},
-		usb: {
-			title: "USB",
-		},
-	};
-};
+type RegisterOptions = { offset?: number };
+type Register = (
+	input: HTMLInputElement,
+	param: Accessor<RegisterOptions>,
+) => void;
 
-interface Props {
-	message: BaseMessage | ExpMessage;
+// Add use:register to JSX props
+declare module "solid-js" {
+	namespace JSX {
+		interface Directives {
+			register?: RegisterOptions;
+		}
+	}
 }
 
-export const Message = ({ message }: Props) => {
-	const parsedMessage = decodeMidiMessage(message);
-	const [type, setType] = createSignal(parsedMessage.type);
+const MessageContext = createContext<{ register: Register }>();
+export const useMessageContext = () => useContext(MessageContext);
 
-	let selectWidthHelper;
-	const [selectWidth, setSelectWidth] = createSignal(0);
-	createEffect(() => {
-		type(); // Depend on type change
-		setSelectWidth(selectWidthHelper.clientWidth + 30);
-	});
+type AnyParsedMessage = ParsedMessage | ParsedExpMessage | ParsedSmartMessage;
 
-	const onChange = (updateFields) => {
-		const updatedMessage = {
-			...parsedMessage,
-			...updateFields,
-		};
-		console.log("updatedMessage", updatedMessage);
+interface Props {
+	message: RawMessage | RawExpMessage | RawSmartMessage;
+}
 
-		const encoded = encodeMidiMessage(updatedMessage);
-		console.log("encoded", encoded);
+export const Message = ({ message: rawMessage }: Props) => {
+	// const message = decodeMidiMessage(rawMessage);
+
+	// Store state is only used for reactive UI
+	const [message, setMessage] = createStore(decodeMidiMessage(rawMessage));
+
+	const fields: Record<
+		string,
+		{
+			element: HTMLInputElement;
+			isValid: boolean;
+			isActive: boolean;
+			path: string[];
+			value: number | string | boolean;
+		}
+	> = {};
+
+	const sync = () => {
+		const newMessage = {};
+		for (const { isValid, isActive, path, value } of Object.values(fields)) {
+			if (!isActive) continue;
+			if (!isValid) return;
+			set(newMessage, path, value);
+		}
+
+		console.log("newMessage", newMessage);
+
+		const encoded = encodeMidiMessage(newMessage as AnyParsedMessage);
+
+		console.log("Should save encoded", encoded);
+	};
+
+	const register: Register = (input, options) => {
+		// TODO: bug? Element is missing attributes in first tick
+		setTimeout(() => {
+			const key = input.name;
+			const path = key.split(".");
+
+			const getValue = () => {
+				let value: number | string | boolean = input.value;
+				if (input.type === "number") {
+					if (input.value.length === 0) return;
+					const offset = options().offset || 0;
+					value = input.valueAsNumber - offset;
+				}
+				if (input.type === "checkbox") value = input.checked;
+				return value;
+			};
+
+			fields[key] = {
+				element: input,
+				isValid: false,
+				path,
+				get isActive(): boolean {
+					return document.body.contains(input);
+				},
+				get value() {
+					return getValue();
+				},
+			};
+
+			// Basic validation, just checks whether field is set
+			const validate = () => {
+				const value = getValue();
+
+				if (input.type === "number") return Number.isFinite(value);
+
+				return value !== undefined && value !== null;
+			};
+
+			const onChange = () => {
+				const isValid = (fields[input.name].isValid = validate());
+				if (!isValid) return;
+
+				setMessage(
+					produce((state) => {
+						set(state, key, getValue());
+					}),
+				);
+			};
+
+			onChange();
+			input.onchange = () => {
+				onChange();
+
+				// Wait for new fields to be registered
+				setTimeout(() => {
+					sync();
+				});
+			};
+		});
 	};
 
 	return (
-		<div class="bg-neutral rounded-lg [width:18rem] p-1 grid gap-3">
-			<div class="flex justify-between relative">
-				<div
-					ref={selectWidthHelper}
-					class="font-semibold text-sm absolute px-1 border border-transparent opacity-0 z-0"
-				>
-					{messages[type()].title}
+		<MessageContext.Provider value={{ register }}>
+			<form class="bg-neutral rounded-lg [width:18rem] p-1 grid gap-3">
+				<div class="flex justify-between relative">
+					<TypeSelect message={message} />
+
+					<button class="btn btn-sm">
+						<VsClose />
+					</button>
 				</div>
-				<select
-					class="select select-sm select-ghost text-secondary focus:text-secondary px-1 pr-4 z-10"
-					style={{
-						width: `${selectWidth()}px`,
-					}}
-					onChange={(event) => setType(event.currentTarget.value)}
-				>
-					<option disabled selected>
-						Type
-					</option>
-					{Object.entries(messages).map(([value, { title }]) => (
-						<option selected={value === type()} value={value}>
-							{title}
-						</option>
-					))}
-				</select>
 
-				<button class="btn btn-sm">
-					<VsClose />
-				</button>
-			</div>
+				<Fields message={message} />
 
-			<Fields message={parsedMessage} onChange={onChange} />
-
-			{type() === MidiMessageType.SmartMessage ? (
-				<SmartFields message={parsedMessage} onChange={onChange} />
-			) : (
-				<div class="grid grid-cols-4">
-					{Object.entries(
-						getOutputs(device()!.getDeviceDescription().hardware),
-					).map(([port, { title }]) => (
-						<label class="label cursor-pointer justify-start gap-1">
-							<input
-								type="checkbox"
-								class="toggle toggle-xs peer"
-								checked={parsedMessage.outputs[port]}
-							/>
-							<span class="label-text text-xs text-base-content/50 peer-checked:text-base-content">
-								{title}
-							</span>
-						</label>
-					))}
-				</div>
-			)}
-		</div>
+				{message.type === MidiMessageType.SmartMessage ? (
+					<SmartFields message={message} />
+				) : (
+					<OutputsSelector message={message} />
+				)}
+			</form>
+		</MessageContext.Provider>
 	);
 };
