@@ -38,7 +38,7 @@ export const BanksListItem: Component<Props> = ({ bankNumber }) => {
 					type="text"
 					placeholder={`Bank ${bankNumber}`}
 					value={bank()?.bankName || ""}
-					onChange={onChange}
+					onInput={onChange}
 					onClick={onClick}
 					onFocus={onClick}
 				/>

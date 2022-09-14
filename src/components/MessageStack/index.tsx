@@ -1,16 +1,38 @@
-import { Component, For } from "solid-js";
+import { Accessor, Component, For } from "solid-js";
 import { AiOutlinePlus } from "solid-icons/ai";
 
 import { state } from "../../store";
 import { createGetBank } from "../../resources/bank";
 import { messageStacks, MessageStackType } from "./config";
 import { Message } from "./Message";
+import { get } from "lodash-es";
+import {
+	BankSettings,
+	RawExpMessage,
+	RawMessage,
+	RawSmartMessage,
+} from "pirate-midi-usb";
 
-const getBankNumber = () => state.selectedBank;
+type AnyRawMessage = RawMessage | RawExpMessage | RawSmartMessage;
 
 interface Props {
 	type: MessageStackType;
 }
+
+const getBankNumber = () => state.selectedBank;
+
+const getMessagesPath = (type: MessageStackType) =>
+	type === "bank"
+		? "bankMessages.messages"
+		: `footswitches[${state.selectedFootswitch}].${type}Messages.messages`;
+
+const getMessages = ({
+	type,
+	bank,
+}: {
+	type: MessageStackType;
+	bank: Accessor<BankSettings>;
+}) => get(bank(), getMessagesPath(type)) as AnyRawMessage[];
 
 export const MessageStack: Component<Props> = ({ type }) => {
 	const [bank] = createGetBank(getBankNumber);
@@ -23,15 +45,13 @@ export const MessageStack: Component<Props> = ({ type }) => {
 				<span>{messageStacks[type].title}</span>
 			</div>
 
-			<For
-				each={
-					type === "bank"
-						? bank().bankMessages.messages
-						: bank().footswitches[state.selectedFootswitch]?.[`${type}Messages`]
-								?.messages
-				}
-			>
-				{(message) => <Message message={message} />}
+			<For each={getMessages({ type, bank })}>
+				{(message, index) => (
+					<Message
+						message={message}
+						path={() => `${getMessagesPath(type)}[${index()}]`}
+					/>
+				)}
 			</For>
 
 			<button class="btn flex items-center justify-center no-animation">

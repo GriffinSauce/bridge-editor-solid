@@ -13,10 +13,15 @@ import {
 import { VsClose } from "solid-icons/vs";
 import { Accessor, createContext, useContext } from "solid-js";
 import { createStore, produce } from "solid-js/store";
+import { state } from "../../store";
+import { createGetBank, createUpdateBank } from "../../resources/bank";
 
 import { Fields, SmartFields } from "./Fields";
 import { OutputsSelector } from "./OutputsSelector";
 import { TypeSelect } from "./TypeSelect";
+import { produce as produceImmer } from "immer";
+
+const getBankNumber = () => state.selectedBank;
 
 type RegisterOptions = { offset?: number };
 type Register = (
@@ -36,14 +41,17 @@ declare module "solid-js" {
 const MessageContext = createContext<{ register: Register }>();
 export const useMessageContext = () => useContext(MessageContext);
 
+type AnyRawMessage = RawMessage | RawExpMessage | RawSmartMessage;
 type AnyParsedMessage = ParsedMessage | ParsedExpMessage | ParsedSmartMessage;
 
 interface Props {
-	message: RawMessage | RawExpMessage | RawSmartMessage;
+	message: AnyRawMessage;
+	path: Accessor<string>;
 }
 
-export const Message = ({ message: rawMessage }: Props) => {
-	// const message = decodeMidiMessage(rawMessage);
+export const Message = ({ message: rawMessage, path }: Props) => {
+	const [bank] = createGetBank(getBankNumber);
+	const { mutateAsync } = createUpdateBank(getBankNumber);
 
 	// Store state is only used for reactive UI
 	const [message, setMessage] = createStore(decodeMidiMessage(rawMessage));
@@ -67,11 +75,15 @@ export const Message = ({ message: rawMessage }: Props) => {
 			set(newMessage, path, value);
 		}
 
-		console.log("newMessage", newMessage);
-
 		const encoded = encodeMidiMessage(newMessage as AnyParsedMessage);
 
 		console.log("Should save encoded", encoded);
+
+		const updatedBank = produceImmer(bank(), (bank) => {
+			set(bank, path(), encoded);
+		});
+
+		mutateAsync(updatedBank);
 	};
 
 	const register: Register = (input, options) => {
@@ -124,7 +136,7 @@ export const Message = ({ message: rawMessage }: Props) => {
 			};
 
 			onChange();
-			input.onchange = () => {
+			input.oninput = () => {
 				onChange();
 
 				// Wait for new fields to be registered
@@ -137,7 +149,7 @@ export const Message = ({ message: rawMessage }: Props) => {
 
 	return (
 		<MessageContext.Provider value={{ register }}>
-			<form class="bg-neutral rounded-lg [width:18rem] p-1 grid gap-3">
+			<div class="bg-neutral rounded-lg [width:18rem] p-1 grid gap-3">
 				<div class="flex justify-between relative">
 					<TypeSelect message={message} />
 
@@ -153,7 +165,7 @@ export const Message = ({ message: rawMessage }: Props) => {
 				) : (
 					<OutputsSelector message={message} />
 				)}
-			</form>
+			</div>
 		</MessageContext.Provider>
 	);
 };
