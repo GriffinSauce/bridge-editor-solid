@@ -22,7 +22,7 @@
 	"dependencies": {
 		"daisyui": "^2.22.0",
 		"lodash-es": "^4.17.21",
-		"pirate-midi-usb": "^2.7.1",
+		"pirate-midi-usb": "^2.8.0",
 		"solid-cached-resource": "^0.3.0",
 		"solid-icons": "^1.0.1",
 		"solid-js": "^1.4.8"

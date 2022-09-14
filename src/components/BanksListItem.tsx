@@ -1,13 +1,17 @@
 import { Component } from "solid-js";
 import { createGetBank, createUpdateBank } from "../resources/bank";
 import { setState, state } from "../store";
+import { device } from "../services/device";
 
 interface Props {
 	bankNumber: number;
 }
 
 export const BanksListItem: Component<Props> = ({ bankNumber }) => {
-	const onClick = () => setState({ selectedBank: bankNumber });
+	const onClick = () => {
+		setState({ selectedBank: bankNumber });
+		device()!.goToBank(bankNumber);
+	};
 
 	const getBankNumber = () => bankNumber;
 	const [bank] = createGetBank(getBankNumber);

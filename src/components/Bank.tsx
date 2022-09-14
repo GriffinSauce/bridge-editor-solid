@@ -1,5 +1,6 @@
 import { Component, Match, Switch } from "solid-js";
 import { createGetBank, createUpdateBank } from "../resources/bank";
+import { device } from "../services/device";
 import { state } from "../store";
 import { FootswitchSelector } from "./FootswitchSelector";
 import { Messages } from "./Messages";
@@ -7,6 +8,8 @@ import { Messages } from "./Messages";
 const getBankNumber = () => state.selectedBank;
 
 export const Bank: Component = () => {
+	const { bankNameLength } = device()!.getDeviceDescription();
+
 	const [bank] = createGetBank(getBankNumber);
 	const { mutateAsync } = createUpdateBank(getBankNumber);
 
@@ -28,6 +31,7 @@ export const Bank: Component = () => {
 							placeholder="Bank name"
 							class="w-full max-w-xs input input-bordered"
 							value={bank()?.bankName}
+							maxLength={bankNameLength}
 							onChange={onChange}
 						/>
 					</section>

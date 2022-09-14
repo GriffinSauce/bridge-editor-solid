@@ -11,6 +11,7 @@ export const createGetBank = (getBankNumber: Accessor<number>) =>
 	createCachedResource(
 		() => ["banks", getBankNumber()],
 		([, bankNumber]) => device()!.getBankSettings(bankNumber as number),
+		{ refetchOnMount: false },
 	);
 
 export const createUpdateBank = (getBankNumber: Accessor<number>) =>
@@ -19,9 +20,9 @@ export const createUpdateBank = (getBankNumber: Accessor<number>) =>
 			device()!.setBankSettings(getBankNumber(), data),
 		{
 			onSuccess: (user) => {
-				mutateCachedValue(() => ["bank", getBankNumber()], user);
 				void device()!.refreshDisplay();
 				void device()!.refreshLeds();
+				mutateCachedValue(() => ["bank", getBankNumber()], user);
 			},
 		},
 	);
