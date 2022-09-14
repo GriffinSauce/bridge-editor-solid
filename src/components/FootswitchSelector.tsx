@@ -20,8 +20,8 @@ export const FootswitchSelector: Component = () => {
 				.map((_, index) => index)
 				.sort((a, b) => {
 					// Sort top row to top
-					const aTop = a > footswitches / 2;
-					const bTop = b > footswitches / 2;
+					const aTop = a > (footswitches - 1) / 2;
+					const bTop = b > (footswitches - 1) / 2;
 					if (aTop === bTop) return 0;
 					return -1;
 				})
