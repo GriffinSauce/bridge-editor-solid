@@ -1,16 +1,20 @@
-import { Accessor, Component, createComputed, For } from "solid-js";
+import { Accessor, Component, For } from "solid-js";
 import { AiOutlinePlus } from "solid-icons/ai";
 
 import { state } from "../../store";
-import { createGetBank } from "../../resources/bank";
+import { createGetBank, createUpdateBank } from "../../resources/bank";
 import { messageStacks, MessageStackType } from "./config";
 import { Message } from "./Message";
-import { get } from "lodash-es";
+import { get, set } from "lodash-es";
+import { produce as produceImmer } from "immer";
 import {
 	BankSettings,
+	encodeMidiMessage,
+	MidiMessageType,
 	RawExpMessage,
 	RawMessage,
 	RawSmartMessage,
+	SmartMessageType,
 } from "pirate-midi-usb";
 
 type AnyRawMessage = RawMessage | RawExpMessage | RawSmartMessage;
@@ -35,8 +39,30 @@ const getMessages = ({
 }) => get(bank(), `${getMessageStackPath(type)}.messages`) as AnyRawMessage[];
 
 export const MessageStack: Component<Props> = ({ type }) => {
+	const stackPath = getMessageStackPath(type);
 	const [bank] = createGetBank(getBankNumber);
+	const { mutateAsync } = createUpdateBank(getBankNumber);
 	const Icon = messageStacks[type].icon;
+
+	const addMessage = () => {
+		const updatedBank = produceImmer(bank(), (bank) => {
+			const messages = [
+				...(get(bank, `${stackPath}.messages`) as AnyRawMessage[]),
+				encodeMidiMessage({
+					type: MidiMessageType.SmartMessage,
+					smartType: SmartMessageType.BankUp,
+				}),
+			];
+
+			set(bank, stackPath, {
+				numMessages: messages.length,
+				messages,
+			});
+		});
+
+		console.log("updatedBank", updatedBank.footswitches[0].pressMessages);
+		mutateAsync(updatedBank);
+	};
 
 	return (
 		<div class="[flex-basis:12rem] flex-shrink-0 flex flex-col gap-2">
@@ -47,15 +73,14 @@ export const MessageStack: Component<Props> = ({ type }) => {
 
 			<For each={getMessages({ type, bank })}>
 				{(message, index) => (
-					<Message
-						message={message}
-						stackPath={getMessageStackPath(type)}
-						index={index}
-					/>
+					<Message message={message} stackPath={stackPath} index={index} />
 				)}
 			</For>
 
-			<button class="btn flex items-center justify-center no-animation">
+			<button
+				class="btn flex items-center justify-center no-animation"
+				onClick={addMessage}
+			>
 				<AiOutlinePlus />
 			</button>
 		</div>

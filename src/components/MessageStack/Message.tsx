@@ -12,8 +12,8 @@ import {
 } from "pirate-midi-usb";
 import { VsClose } from "solid-icons/vs";
 import { Accessor, createContext, useContext } from "solid-js";
-import { produce } from "immer";
-import { createStore, unwrap } from "solid-js/store";
+import { produce as produceImmer } from "immer";
+import { createStore, produce } from "solid-js/store";
 import { state } from "../../store";
 import { createGetBank, createUpdateBank } from "../../resources/bank";
 
@@ -78,7 +78,7 @@ export const Message = ({ message: rawMessage, stackPath, index }: Props) => {
 
 		const encoded = encodeMidiMessage(newMessage as AnyParsedMessage);
 
-		const updatedBank = produce(bank(), (bank) => {
+		const updatedBank = produceImmer(bank(), (bank) => {
 			set(bank, `${stackPath}.messages[${index()}]`, encoded);
 		});
 
@@ -128,7 +128,7 @@ export const Message = ({ message: rawMessage, stackPath, index }: Props) => {
 				if (!isValid) return;
 
 				setMessage(
-					produce(unwrap(message), (state) => {
+					produce((state) => {
 						set(state, key, getValue());
 					}),
 				);
@@ -147,7 +147,7 @@ export const Message = ({ message: rawMessage, stackPath, index }: Props) => {
 	};
 
 	const onDelete = () => {
-		const updatedBank = produce(bank(), (bank) => {
+		const updatedBank = produceImmer(bank(), (bank) => {
 			const messages = get(bank, `${stackPath}.messages`) as AnyRawMessage[];
 			messages.splice(index(), 1);
 
