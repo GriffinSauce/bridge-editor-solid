@@ -19,13 +19,6 @@ export const Bank: Component = () => {
 		mutateAsync({ bankName: event.target.value });
 	}, 100);
 
-	const onChangeFootswitchName = debounce((event) => {
-		const footswitches = produce(bank().footswitches, (fs) => {
-			fs[state.selectedFootswitch].name = event.target.value;
-		});
-		mutateAsync({ footswitches });
-	}, 100);
-
 	return (
 		<Switch fallback={<span>Select a bank</span>}>
 			<Match when={bank.loading}>
@@ -49,17 +42,6 @@ export const Bank: Component = () => {
 
 					<section>
 						<FootswitchSelector />
-					</section>
-
-					<section>
-						<input
-							type="text"
-							placeholder="Footswitch name"
-							class="w-full max-w-xs input input-bordered"
-							value={bank()?.footswitches[state.selectedFootswitch].name}
-							maxLength={switchNameLength}
-							onInput={onChangeFootswitchName}
-						/>
 					</section>
 
 					<section class="min-w-0">
