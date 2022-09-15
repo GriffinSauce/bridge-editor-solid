@@ -1,4 +1,4 @@
-import { set } from "lodash-es";
+import { get, set } from "lodash-es";
 import {
 	decodeMidiMessage,
 	encodeMidiMessage,
@@ -12,14 +12,14 @@ import {
 } from "pirate-midi-usb";
 import { VsClose } from "solid-icons/vs";
 import { Accessor, createContext, useContext } from "solid-js";
-import { createStore, produce } from "solid-js/store";
+import { produce } from "immer";
+import { createStore, unwrap } from "solid-js/store";
 import { state } from "../../store";
 import { createGetBank, createUpdateBank } from "../../resources/bank";
 
 import { Fields, SmartFields } from "./Fields";
 import { OutputsSelector } from "./OutputsSelector";
 import { TypeSelect } from "./TypeSelect";
-import { produce as produceImmer } from "immer";
 
 const getBankNumber = () => state.selectedBank;
 
@@ -46,10 +46,11 @@ type AnyParsedMessage = ParsedMessage | ParsedExpMessage | ParsedSmartMessage;
 
 interface Props {
 	message: AnyRawMessage;
-	path: Accessor<string>;
+	stackPath: string;
+	index: Accessor<number>;
 }
 
-export const Message = ({ message: rawMessage, path }: Props) => {
+export const Message = ({ message: rawMessage, stackPath, index }: Props) => {
 	const [bank] = createGetBank(getBankNumber);
 	const { mutateAsync } = createUpdateBank(getBankNumber);
 
@@ -77,10 +78,8 @@ export const Message = ({ message: rawMessage, path }: Props) => {
 
 		const encoded = encodeMidiMessage(newMessage as AnyParsedMessage);
 
-		console.log("Should save encoded", encoded);
-
-		const updatedBank = produceImmer(bank(), (bank) => {
-			set(bank, path(), encoded);
+		const updatedBank = produce(bank(), (bank) => {
+			set(bank, `${stackPath}.messages[${index()}]`, encoded);
 		});
 
 		mutateAsync(updatedBank);
@@ -129,7 +128,7 @@ export const Message = ({ message: rawMessage, path }: Props) => {
 				if (!isValid) return;
 
 				setMessage(
-					produce((state) => {
+					produce(unwrap(message), (state) => {
 						set(state, key, getValue());
 					}),
 				);
@@ -147,13 +146,27 @@ export const Message = ({ message: rawMessage, path }: Props) => {
 		});
 	};
 
+	const onDelete = () => {
+		const updatedBank = produce(bank(), (bank) => {
+			const messages = get(bank, `${stackPath}.messages`) as AnyRawMessage[];
+			messages.splice(index(), 1);
+
+			set(bank, stackPath, {
+				numMessages: messages.length,
+				messages,
+			});
+		});
+
+		mutateAsync(updatedBank);
+	};
+
 	return (
 		<MessageContext.Provider value={{ register }}>
 			<div class="bg-neutral rounded-lg [width:18rem] p-1 grid gap-3">
 				<div class="flex justify-between relative">
 					<TypeSelect message={message} />
 
-					<button class="btn btn-sm">
+					<button class="btn btn-sm" onClick={onDelete}>
 						<VsClose />
 					</button>
 				</div>

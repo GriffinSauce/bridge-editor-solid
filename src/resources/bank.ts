@@ -16,13 +16,15 @@ export const createGetBank = (getBankNumber: Accessor<number>) =>
 
 export const createUpdateBank = (getBankNumber: Accessor<number>) =>
 	createMutation(
-		(data: Partial<BankSettings>) =>
-			device()!.setBankSettings(getBankNumber(), data),
+		async (data: Partial<BankSettings>) => {
+			await device()!.setBankSettings(getBankNumber(), data);
+			return device()!.getBankSettings(getBankNumber());
+		},
 		{
-			onSuccess: (user) => {
+			onSuccess: (bank) => {
 				void device()!.refreshDisplay();
 				void device()!.refreshLeds();
-				mutateCachedValue(() => ["bank", getBankNumber()], user);
+				mutateCachedValue(() => ["banks", getBankNumber()], bank);
 			},
 		},
 	);

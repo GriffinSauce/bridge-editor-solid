@@ -1,4 +1,4 @@
-import { Accessor, Component, For } from "solid-js";
+import { Accessor, Component, createComputed, For } from "solid-js";
 import { AiOutlinePlus } from "solid-icons/ai";
 
 import { state } from "../../store";
@@ -21,10 +21,10 @@ interface Props {
 
 const getBankNumber = () => state.selectedBank;
 
-const getMessagesPath = (type: MessageStackType) =>
+const getMessageStackPath = (type: MessageStackType) =>
 	type === "bank"
-		? "bankMessages.messages"
-		: `footswitches[${state.selectedFootswitch}].${type}Messages.messages`;
+		? "bankMessages"
+		: `footswitches[${state.selectedFootswitch}].${type}Messages`;
 
 const getMessages = ({
 	type,
@@ -32,7 +32,7 @@ const getMessages = ({
 }: {
 	type: MessageStackType;
 	bank: Accessor<BankSettings>;
-}) => get(bank(), getMessagesPath(type)) as AnyRawMessage[];
+}) => get(bank(), `${getMessageStackPath(type)}.messages`) as AnyRawMessage[];
 
 export const MessageStack: Component<Props> = ({ type }) => {
 	const [bank] = createGetBank(getBankNumber);
@@ -49,7 +49,8 @@ export const MessageStack: Component<Props> = ({ type }) => {
 				{(message, index) => (
 					<Message
 						message={message}
-						path={() => `${getMessagesPath(type)}[${index()}]`}
+						stackPath={getMessageStackPath(type)}
+						index={index}
 					/>
 				)}
 			</For>
