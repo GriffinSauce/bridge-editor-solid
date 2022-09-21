@@ -24,7 +24,7 @@
 		"file-saver": "^2.0.5",
 		"immer": "^9.0.15",
 		"lodash-es": "^4.17.21",
-		"pirate-midi-usb": "^2.9.0",
+		"pirate-midi-usb": "^2.10.0",
 		"solid-cached-resource": "^0.4.0",
 		"solid-icons": "^1.0.1",
 		"solid-js": "^1.4.8"
