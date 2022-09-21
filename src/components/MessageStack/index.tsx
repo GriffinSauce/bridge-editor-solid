@@ -60,7 +60,6 @@ export const MessageStack: Component<Props> = ({ type }) => {
 			});
 		});
 
-		console.log("updatedBank", updatedBank.footswitches[0].pressMessages);
 		mutateAsync(updatedBank);
 	};
 
