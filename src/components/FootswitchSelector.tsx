@@ -67,7 +67,7 @@ export const FootswitchSelector: Component = () => {
 				["grid-cols-3"]: footswitches === 6,
 				["grid-cols-2"]: footswitches !== 6,
 			}}
-			class="grid gap-3"
+			class="inline-grid gap-3"
 		>
 			{Array(footswitches)
 				.fill(undefined)
