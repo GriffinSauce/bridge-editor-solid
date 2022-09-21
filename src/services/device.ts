@@ -44,6 +44,7 @@ export const connectMock = async (deviceState: DeviceState) => {
 };
 
 export const disconnect = () => {
+	void device().disconnect();
 	setDevice(undefined);
 	setConnected(false);
 };
