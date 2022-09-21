@@ -21,6 +21,7 @@
 	},
 	"dependencies": {
 		"daisyui": "^2.22.0",
+		"file-saver": "^2.0.5",
 		"immer": "^9.0.15",
 		"lodash-es": "^4.17.21",
 		"pirate-midi-usb": "^2.9.0",

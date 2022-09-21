@@ -39,7 +39,8 @@ const Intro = () => {
 			<h1 class="text-5xl font-bold text-center">Bridge Editor</h1>
 
 			<p class="text-2xl">
-				An aftermarket editor for Pirate Midi Bridge controllers.
+				An <span class="font-semibold">unofficial</span> editor for Pirate Midi
+				Bridge controllers.
 			</p>
 
 			<button class="btn btn-primary" onClick={connect}>

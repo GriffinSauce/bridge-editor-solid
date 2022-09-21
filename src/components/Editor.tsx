@@ -1,15 +1,13 @@
 import { Component, createSignal } from "solid-js";
+import { Backup } from "./Backup";
 import { Bank } from "./Bank";
 import { BanksList } from "./BanksList";
-// import { GlobalSettings } from './GlobalSettings';
-
-const GlobalSettings = () => "GlobalSettings";
 
 const Editor: Component = () => {
-	const [tab, setTab] = createSignal<"banks" | "global">("banks");
+	const [tab, setTab] = createSignal<"banks" | "backup">("banks");
 
 	return (
-		<main class="flex flex-col items-start justify-start flex-1 min-h-0 px-6 space-y-3 text-center">
+		<main class="flex flex-col items-stretch justify-start flex-1 min-h-0 px-6 space-y-3 text-center ">
 			<div class="tabs tabs-bordered">
 				<a
 					classList={{
@@ -22,12 +20,12 @@ const Editor: Component = () => {
 				</a>
 				<a
 					classList={{
-						"tab-active": tab() === "global",
+						"tab-active": tab() === "backup",
 					}}
 					class="tab tab-bordered"
-					onClick={() => setTab("global")}
+					onClick={() => setTab("backup")}
 				>
-					Global
+					Backup
 				</a>
 			</div>
 
@@ -41,7 +39,7 @@ const Editor: Component = () => {
 					</div>
 				</div>
 			) : (
-				<GlobalSettings />
+				<Backup />
 			)}
 		</main>
 	);
