@@ -1,6 +1,9 @@
 import { Component, Match, Switch } from "solid-js";
-import { produce } from "immer";
-import { createGetBank, createUpdateBank } from "../resources/bank";
+import {
+	createGetBank,
+	createRefetchBank,
+	createUpdateBank,
+} from "../resources/bank";
 import { device } from "../services/device";
 import { state } from "../store";
 import { FootswitchSelector } from "./FootswitchSelector";
@@ -10,13 +13,14 @@ import { debounce } from "lodash-es";
 const getBankNumber = () => state.selectedBank;
 
 export const Bank: Component = () => {
-	const { bankNameLength, switchNameLength } = device()!.getDeviceDescription();
+	const { bankNameLength } = device()!.getDeviceDescription();
 
 	const [bank] = createGetBank(getBankNumber);
-	const { mutateAsync } = createUpdateBank(getBankNumber);
+	const updateBank = createUpdateBank(getBankNumber);
+	const refetchBank = createRefetchBank(getBankNumber);
 
 	const onChangeBankName = debounce((event) => {
-		mutateAsync({ bankName: event.target.value });
+		updateBank({ bankName: event.target.value });
 	}, 100);
 
 	return (
@@ -37,6 +41,7 @@ export const Bank: Component = () => {
 							value={bank()?.bankName}
 							maxLength={bankNameLength}
 							onInput={onChangeBankName}
+							onBlur={refetchBank}
 						/>
 					</section>
 

@@ -1,7 +1,11 @@
 import produce from "immer";
 import { debounce } from "lodash-es";
 import { Component } from "solid-js";
-import { createGetBank, createUpdateBank } from "../resources/bank";
+import {
+	createGetBank,
+	createRefetchBank,
+	createUpdateBank,
+} from "../resources/bank";
 import { device } from "../services/device";
 import { setState, state } from "../store";
 
@@ -10,7 +14,8 @@ const getBankNumber = () => state.selectedBank;
 const Footswitch = ({ index }: { index: number }) => {
 	const { switchNameLength } = device()!.getDeviceDescription();
 	const [bank] = createGetBank(getBankNumber);
-	const { mutateAsync } = createUpdateBank(getBankNumber);
+	const updateBank = createUpdateBank(getBankNumber);
+	const refetchBank = createRefetchBank(getBankNumber);
 
 	let inputRef;
 
@@ -18,7 +23,7 @@ const Footswitch = ({ index }: { index: number }) => {
 		const footswitches = produce(bank().footswitches, (fs) => {
 			fs[index].name = event.target.value;
 		});
-		mutateAsync({ footswitches });
+		updateBank({ footswitches });
 	}, 100);
 
 	const onClick = () => {
@@ -41,6 +46,7 @@ const Footswitch = ({ index }: { index: number }) => {
 				onInput={onChange}
 				onClick={onClick}
 				onFocus={onClick}
+				onBlur={refetchBank}
 			/>
 			<button
 				type="button"

@@ -2,7 +2,7 @@ import { Accessor, Component, For } from "solid-js";
 import { AiOutlinePlus } from "solid-icons/ai";
 
 import { state } from "../../store";
-import { createGetBank, createUpdateBank } from "../../resources/bank";
+import { createGetBank, createMutateBank } from "../../resources/bank";
 import { messageStacks, MessageStackType } from "./config";
 import { Message } from "./Message";
 import { get, set } from "lodash-es";
@@ -41,7 +41,7 @@ const getMessages = ({
 export const MessageStack: Component<Props> = ({ type }) => {
 	const stackPath = getMessageStackPath(type);
 	const [bank] = createGetBank(getBankNumber);
-	const { mutateAsync } = createUpdateBank(getBankNumber);
+	const { mutateAsync } = createMutateBank(getBankNumber);
 	const Icon = messageStacks[type].icon;
 
 	const addMessage = () => {

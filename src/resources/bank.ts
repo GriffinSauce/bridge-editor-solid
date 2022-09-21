@@ -14,17 +14,30 @@ export const createGetBank = (getBankNumber: Accessor<number>) =>
 		{ refetchOnMount: false },
 	);
 
-export const createUpdateBank = (getBankNumber: Accessor<number>) =>
+export const createMutateBank = (getBankNumber: Accessor<number>) =>
 	createMutation(
 		async (data: Partial<BankSettings>) => {
 			await device()!.setBankSettings(getBankNumber(), data);
 			return device()!.getBankSettings(getBankNumber());
 		},
 		{
-			onSuccess: (bank) => {
-				void device()!.refreshDisplay();
-				void device()!.refreshLeds();
+			onSuccess: async (bank) => {
+				await device()!.refreshDisplay();
+				await device()!.refreshLeds();
 				mutateCachedValue(() => ["banks", getBankNumber()], bank);
 			},
 		},
 	);
+
+export const createUpdateBank =
+	(getBankNumber: Accessor<number>) => async (data: Partial<BankSettings>) => {
+		await device()!.setBankSettings(getBankNumber(), data);
+		await device()!.refreshDisplay();
+		await device()!.refreshLeds();
+	};
+
+export const createRefetchBank =
+	(getBankNumber: Accessor<number>) => async () => {
+		const bank = await device()!.getBankSettings(getBankNumber());
+		mutateCachedValue(() => ["banks", getBankNumber()], bank);
+	};

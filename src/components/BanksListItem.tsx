@@ -1,5 +1,5 @@
 import { Component } from "solid-js";
-import { createGetBank, createUpdateBank } from "../resources/bank";
+import { createGetBank, createMutateBank } from "../resources/bank";
 import { setState, state } from "../store";
 import { device } from "../services/device";
 
@@ -15,7 +15,7 @@ export const BanksListItem: Component<Props> = ({ bankNumber }) => {
 
 	const getBankNumber = () => bankNumber;
 	const [bank] = createGetBank(getBankNumber);
-	const { mutateAsync } = createUpdateBank(getBankNumber);
+	const { mutateAsync } = createMutateBank(getBankNumber);
 
 	const onChange = (event) => mutateAsync({ bankName: event.target.value });
 

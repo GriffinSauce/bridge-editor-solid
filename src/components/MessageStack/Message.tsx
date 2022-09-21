@@ -15,7 +15,7 @@ import { Accessor, createContext, useContext } from "solid-js";
 import { produce as produceImmer } from "immer";
 import { createStore, produce } from "solid-js/store";
 import { state } from "../../store";
-import { createGetBank, createUpdateBank } from "../../resources/bank";
+import { createGetBank, createMutateBank } from "../../resources/bank";
 
 import { Fields, SmartFields } from "./Fields";
 import { OutputsSelector } from "./OutputsSelector";
@@ -52,7 +52,7 @@ interface Props {
 
 export const Message = ({ message: rawMessage, stackPath, index }: Props) => {
 	const [bank] = createGetBank(getBankNumber);
-	const { mutateAsync } = createUpdateBank(getBankNumber);
+	const { mutateAsync } = createMutateBank(getBankNumber);
 
 	// Store state is only used for reactive UI
 	const [message, setMessage] = createStore(decodeMidiMessage(rawMessage));
